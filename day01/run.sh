@@ -1,2 +1,3 @@
 #!/bin/bash
-python3 day01.py day01.input
+cd "$(dirname "$0")"
+python3 solution.py example.txt input.txt
