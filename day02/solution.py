@@ -54,14 +54,6 @@ def aim(data:list):
     pp.info("part 1 answer:" + str(horizontal * dumb_depth))
     pp.info("part 2 answer:" + str(horizontal * depth))
 
-def product_of_depth_and_horizontal(data: list):
-    forward = data['forward']
-    down = data['down']
-    up = data['up']
-    horizontal = forward
-    depth = down - up
-    return depth * horizontal
-
 if __name__ == "__main__":
     # check the passed arguments are correct
     if len(sys.argv) == 1:
