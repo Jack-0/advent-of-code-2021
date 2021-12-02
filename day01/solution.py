@@ -10,9 +10,6 @@ import sys
 sys.path.append('..') # add parent dir to path (for tools import)
 from tools.prettyprint import PrettyPrint
 
-EXPECTED_INPUT = 2  # script expects day01.py as a input
-                    # and a file, thus 2 args
-
 pp = PrettyPrint()
 
 # turn a file into a list of integers
@@ -55,16 +52,18 @@ def count_increases(data:list):
 
 if __name__ == "__main__":
     # check the passed arguments are correct
-    if len(sys.argv) != EXPECTED_INPUT:
-        raise Exception("Expected " + str(EXPECTED_INPUT)+\
-                        " arguments, but recieved " + str(len(sys.argv)))
-    # read input file and get count
-    input_file = sys.argv[1]
-    pp.info("File: " + input_file)
-    data = file_to_int_list(input_file)
-    # count data
-    res = count_increases(data)
-    pp.info("Count result: " + str(res))
-    # sliding window of 3
-    res = sliding_window_count(3, data)
-    pp.info("Sliding window result: " + str(res))
+    if len(sys.argv) == 1:
+        raise Exception(str(sys.argv[0]) + " expected more arguments")
+
+    # for all given files
+    input_files = sys.argv[1:]
+    for input_file in input_files:
+        # read input file and get count
+        pp.warn("File: " + input_file)
+        data = file_to_int_list(input_file)
+        # count data
+        res = count_increases(data)
+        pp.info("Count result: " + str(res))
+        # sliding window of 3
+        res = sliding_window_count(3, data)
+        pp.info("Sliding window result: " + str(res))
