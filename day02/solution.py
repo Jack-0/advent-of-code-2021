@@ -21,6 +21,9 @@ def file_to_list(file_path:str):
 # given a list that conatins <str> <int>
 # return the sum of ints for each unique <str>
 def sum_for_each_str(data:list):
+    aim = 0
+    depth = 0
+    horizontal = 0
     word_count_dict = {}
     for line in data:
         word = line.split()[0]
@@ -29,6 +32,15 @@ def sum_for_each_str(data:list):
             word_count_dict[word] = word_count_dict[word] + value
         else:
             word_count_dict[word] = value
+
+        if word == "down":
+            aim += value
+        elif word == "up":
+            aim -= value
+        elif word == "forward":
+            horizontal += value
+            depth += aim * value
+    pp.warn(horizontal * depth)
     return word_count_dict
 
 def product_of_depth_and_horizontal(data: list):
@@ -38,7 +50,6 @@ def product_of_depth_and_horizontal(data: list):
     horizontal = forward
     depth = down - up
     return depth * horizontal
-
 
 if __name__ == "__main__":
     # check the passed arguments are correct
