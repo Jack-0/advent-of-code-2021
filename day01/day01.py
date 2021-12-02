@@ -22,11 +22,15 @@ def file_to_int_list(file_path:str):
     data = list(map(int, data))
     return data
 
+# performs a sliding window count of 
+# window_size on a given list of data
 def sliding_window_count(window_size:int,data:list):
     res = []
     for idx, value in enumerate(data):
+        # ignore any windows that go out of bounds
         if idx + window_size > len(data):
             pass
+        # sum up values for the given window size and append
         else:
             tmp = 0
             for i in range(0,window_size):
