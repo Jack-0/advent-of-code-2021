@@ -32,15 +32,9 @@ def aim(data:list):
     dumb_depth = 0 #for part one only
     depth = 0
     horizontal = 0
-    word_count_dict = {}
     for line in data:
         word = line.split()[0]
         value = int(line.split()[1])
-        if word in word_count_dict.keys():
-            word_count_dict[word] = word_count_dict[word] + value
-        else:
-            word_count_dict[word] = value
-
         if word == "down":
             dumb_depth += value
             aim += value
@@ -50,7 +44,6 @@ def aim(data:list):
         elif word == "forward":
             horizontal += value
             depth += aim * value
-
     pp.info("part 1 answer:" + str(horizontal * dumb_depth))
     pp.info("part 2 answer:" + str(horizontal * depth))
 
