@@ -22,6 +22,18 @@ def file_to_int_list(file_path:str):
     data = list(map(int, data))
     return data
 
+def sliding_window_count(window_size:int,data:list):
+    res = []
+    for idx, value in enumerate(data):
+        if idx + window_size > len(data):
+            pass
+        else:
+            tmp = 0
+            for i in range(0,window_size):
+                tmp += data[idx + i]
+            res.append(tmp)
+    return count_increases(res)
+
 def count_increases(data:list):
     # count the number of the current value is greater
     # than the previous value
@@ -44,8 +56,11 @@ if __name__ == "__main__":
                         " arguments, but recieved " + str(len(sys.argv)))
     # read input file and get count
     input_file = sys.argv[1]
-    pp.info(input_file)
+    pp.info("File: " + input_file)
     data = file_to_int_list(input_file)
-    count = count_increases(data)
-    # print answer
-    pp.info("Result: " + str(count))
+    # count data
+    res = count_increases(data)
+    pp.info("Count result: " + str(res))
+    # sliding window of 3
+    res = sliding_window_count(3, data)
+    pp.info("Sliding window result: " + str(res))
