@@ -19,9 +19,17 @@ def file_to_list(file_path:str):
     return data
 
 # given a list that conatins <str> <int>
-# return the sum of ints for each unique <str>
-def sum_for_each_str(data:list):
+# some words alter values:
+#   "down" 
+#       increases aim by x units
+#   "up" 
+#       decrease aim by x units
+#   "forward" 
+#       increase horizontal by x units
+#       increase depth by aim multiplied by x
+def aim(data:list):
     aim = 0
+    dumb_depth = 0 #for part one only
     depth = 0
     horizontal = 0
     word_count_dict = {}
@@ -34,14 +42,17 @@ def sum_for_each_str(data:list):
             word_count_dict[word] = value
 
         if word == "down":
+            dumb_depth += value
             aim += value
         elif word == "up":
             aim -= value
+            dumb_depth -= value
         elif word == "forward":
             horizontal += value
             depth += aim * value
-    pp.warn(horizontal * depth)
-    return word_count_dict
+
+    pp.info("part 1 answer:" + str(horizontal * dumb_depth))
+    pp.info("part 2 answer:" + str(horizontal * depth))
 
 def product_of_depth_and_horizontal(data: list):
     forward = data['forward']
@@ -62,9 +73,4 @@ if __name__ == "__main__":
         # read input file and get count
         pp.warn("File: " + input_file)
         data = file_to_list(input_file)
-        # sum of each str
-        data = sum_for_each_str(data)
-        pp.info("Data: " + str(data))
-        # product of depth and horizontal pos
-        res = product_of_depth_and_horizontal(data)
-        pp.info("Result: " + str(res))
+        aim(data)
