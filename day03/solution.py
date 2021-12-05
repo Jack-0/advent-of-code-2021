@@ -34,18 +34,62 @@ def file_to_list(file_path:str):
 def sum_0_1_via_cols(data:list):
     total_0 = 0
     total_1 = 0
-    length = len(data[0])
-    index_bit = [[0 for x in range(2)] for y in range(length)]
-    pp.info("Line length: " + str(length))
-    pp.info("List info: " + str(index_bit))
+    height = len(data[0])
+    res = [[0 for x in range(2)] for y in range(height)]
     for line in data:
         for idx, i in enumerate(line):
             if i == '0':
-                index_bit[idx][0] += 1
+                res[idx][0] += 1
             else:
-                index_bit[idx][1] += 1
-    pp.info("Data :" + str(index_bit))
-    return index_bit
+                res[idx][1] += 1
+    return res
+
+def data_into_columnns(data:list):
+    width = len(data[0])
+    height = len(data)
+    res = [[None for x in range(width)] for y in range(height)]
+    for i, line in enumerate(data):
+        for j, value in enumerate(line):
+            res[i][j] = value
+    return res
+
+def more_zeros_than_ones(idx:int, lst:list):
+    # counts
+    zero_count = lst[idx][0]
+    one_count = lst[idx][1]
+    if zero_count > one_count:
+        return True
+    return False
+
+def calc_rating(most_common, data, bit_crit):
+    other_bit = 0
+    if bit_crit == 0:
+        other_bit = 1
+    res = data.copy()
+    while len(res) > 1:
+        for line in res:
+            for i in range(len(line)):
+                if more_zeros_than_ones(i, most_common):
+                    res = prune_value_from_data(i, bit_crit, res)
+                    most_common = sum_0_1_via_cols(res)
+                else:
+                    res = prune_value_from_data(i, other_bit, res)
+                    most_common = sum_0_1_via_cols(res)
+
+    pp.info("Rating result: " + str(res))
+    res = bit_lst_to_int(res[0])
+    return res
+
+def prune_value_from_data(idx, value, data:list):
+    if len(data) == 1:
+        return data
+    res = data.copy()
+    removed_count = 0
+    for ref, line in enumerate(data):
+        if int(line[idx]) == int(value):
+            res.pop(ref - removed_count)
+            removed_count += 1
+    return res
 
 def index_bits_to_gamma_epsilon(data:list):
     gamma = [None for x in range(len(data))]
@@ -59,16 +103,12 @@ def index_bits_to_gamma_epsilon(data:list):
             epsilon[idx] = '0'
         else:
             pp.warn("Not defined by solution")
-    gamma_str = ''.join(gamma)
-    epsilon_str = ''.join(epsilon)
-    gamma_int = int(gamma_str, 2)
-    epsilon_int = int(epsilon_str, 2)
-    pp.info("Gamma binary   : " + gamma_str + " = " + str(gamma_int))
-    pp.info("Epsilon binary : " + epsilon_str + " = " + str(epsilon_int))
-    power = gamma_int * epsilon_int
-    pp.warn("Solution (power): "+ str(power))
+    power = bit_lst_to_int(gamma) * bit_lst_to_int(epsilon)
+    pp.warn("Part 1 Solution (power): "+ str(power))
 
-
+def bit_lst_to_int(b:list):
+    b = ''.join(b)
+    return int(b, 2)
 
 if __name__ == "__main__":
     # check the passed arguments are correct
@@ -81,6 +121,14 @@ if __name__ == "__main__":
         # read input file and get count
         pp.warn("File: " + input_file)
         data = file_to_list(input_file)
-        data = sum_0_1_via_cols(data)
-        data = index_bits_to_gamma_epsilon(data)
+        most_common = sum_0_1_via_cols(data)
+        data = data_into_columnns(data)
+        index_bits_to_gamma_epsilon(most_common)
+        #calc_oxygen_c02(most_common, data)
+        oxygen = calc_rating(most_common, data, 1)
+        c02 = calc_rating(most_common, data, 0)
+        pp.info("Oxygen: "+str(oxygen))
+        pp.info("C02: "+str(c02))
+        rating = oxygen * c02
+        pp.info("C02 scrubber rating: " + str(rating))
 
