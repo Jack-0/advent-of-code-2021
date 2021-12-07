@@ -36,7 +36,10 @@ def santise_data(data:list):
                 idx = 0
     return numbers, boards
 
-def total_board_idx(board, incr_row, incr_col):
+# for a given 5 rows or columns find out if 
+# the total is 5 thus marking a winner
+# incr_row and incr_col are offsets
+def find_completed(board, incr_row, incr_col):
     total = 0
     start = 0
     idx = 0
@@ -52,14 +55,8 @@ def total_board_idx(board, incr_row, incr_col):
 
 # check if board is a winner
 def is_win(board:list):
-    #pp.warn("is win")
-    # check row
-    if total_board_idx(board, 1, 5):
-        return True
-    #check col
-    if total_board_idx(board, 5 , 1):
-        return True
-    return False
+    # return completed row or completed col results
+    return find_completed(board, 1, 5) or find_completed(board, 5 , 1)
 
 def bingo(numbers,boards):
     total_boards = len(boards)
