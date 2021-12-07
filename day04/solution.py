@@ -20,11 +20,7 @@ def file_to_list(file_path:str):
 
 # Santise data into a useable format
 def santise_data(data:list):
-    #numbers = data[0].split(',')
-    #numbers = map(int,numbers)
     numbers = data[0].split(',')
-    pp.debug(numbers)
-    #return
     boards = []
     board = []
     idx = 0
@@ -36,38 +32,37 @@ def santise_data(data:list):
                 idx += 1
             except:
                 pass
-            #pp.info(idx)
             if idx == 25:
                 boards.append(board)
                 board = []
                 idx = 0
-
-        #board.extend([[int(x),0] for x in line if x != ''])
-    for x in boards:
-        pp.info(x)
-
     return numbers, boards
 
-def total_board_idx(board, idx, increment):
+def total_board_idx(board, incr_row, incr_col):
     total = 0
-    print(board)
-    start=0
+    start = 0
+    idx = 0
     for i in range(5):
-        total += board[increment+idx*i][1]
-        start += increment
-    if total == 5:
-        return True
-
+        idx = (i * incr_row)
+        total = 0
+        for j in range(5):
+            total += board[idx][1]
+            idx += incr_col
+        if total == 5:
+            return True
+    return False
 
 # check if board is a winner
 def is_win(board:list):
-    win = False
-    if total_board_idx(board, 1,5):
-        win = True
-    if total_board_idx(board, 5,1):
-        win = True
-    return win
-
+    pp.warn("is win")
+    # check row
+    if total_board_idx(board, 1, 5):
+        return True
+    #check col
+    if total_board_idx(board, 5 , 1):
+        return True
+    #raise Exception("hey")
+    return False
 
 def bingo(numbers,boards):
     #bingo = False
@@ -76,10 +71,10 @@ def bingo(numbers,boards):
 
         for b_idx, board in enumerate(boards):
             for d_idx, data in enumerate(board):
-                #pp.info(data)
                 if data[0] == int(value):
                     boards[b_idx][d_idx][1] = 1
-        for idx, board in enumerate(boards):
+        for board in boards:
+            pp.debug(board)
             if is_win(board):
                 board_total = 0
                 for data in board:
@@ -89,16 +84,10 @@ def bingo(numbers,boards):
                 res = board_total*value
                 pp.info("Part 1 solition: " + str(res))
                 return
-            pp.warn(idx)
-        if value == 15:
-            return
-
 
 def score(value:int,board:list):
     board_sum = 0
-    print()
     for row in board:
-        #pp.info(row)
         for col in row:
             if col[1] == 0:
                 board_sum += col[0]
@@ -121,5 +110,4 @@ if __name__ == "__main__":
         pp.info(numbers)
         pp.info("Boards:")
         bingo(numbers,boards)
-        for i in numbers:
-            print(str(i),end=" ")
+        #pp.debug(numbers)
