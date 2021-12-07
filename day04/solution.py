@@ -2,8 +2,6 @@
 """
 Advent of code
 Day 4: Bingo
-
-This program requires a file of integers seperated by new lines as an input.
 """
 
 import sys
@@ -54,45 +52,48 @@ def total_board_idx(board, incr_row, incr_col):
 
 # check if board is a winner
 def is_win(board:list):
-    pp.warn("is win")
+    #pp.warn("is win")
     # check row
     if total_board_idx(board, 1, 5):
         return True
     #check col
     if total_board_idx(board, 5 , 1):
         return True
-    #raise Exception("hey")
     return False
 
 def bingo(numbers,boards):
-    #bingo = False
+    total_boards = len(boards)
+    completed_boards = []
+    part_1_res = True
     for value in numbers:
         value = int(value)
-
         for b_idx, board in enumerate(boards):
             for d_idx, data in enumerate(board):
                 if data[0] == int(value):
                     boards[b_idx][d_idx][1] = 1
-        for board in boards:
-            pp.debug(board)
+        for idx, board in enumerate(boards):
+            #pp.debug(board)
             if is_win(board):
-                board_total = 0
-                for data in board:
-                    if data[1] == 0:
-                        board_total += data[0]
-                pp.warn(board)
-                res = board_total*value
-                pp.info("Part 1 solition: " + str(res))
-                return
+                # part2
+                if idx not in completed_boards:
+                    completed_boards.append(idx)
+                if len(completed_boards) == total_boards:
+                    res = score(value, board)
+                    pp.info("Part 2 solution: " + str(res))
+                    return
+                # part 1
+                if part_1_res:
+                    res = score(value, board)
+                    pp.info("Part 1 solution: " + str(res))
+                    part_1_res = False
+
 
 def score(value:int,board:list):
-    board_sum = 0
-    for row in board:
-        for col in row:
-            if col[1] == 0:
-                board_sum += col[0]
-    pp.warn("board sum = " + str(board_sum) + " value = " + str(value))
-    pp.info("score is " + str(board_sum * value))
+    board_total = 0
+    for data in board:
+        if data[1] == 0:
+            board_total += data[0]
+    return board_total * value
 
 if __name__ == "__main__":
     # check the passed arguments are correct
@@ -106,8 +107,4 @@ if __name__ == "__main__":
         pp.warn("File: " + input_file)
         data = file_to_list(input_file)
         numbers, boards = santise_data(data)
-        pp.info("Numbers:")
-        pp.info(numbers)
-        pp.info("Boards:")
         bingo(numbers,boards)
-        #pp.debug(numbers)
