@@ -7,80 +7,63 @@ Day 5: Hydothermal Venture
 import sys
 sys.path.append('..') # add parent dir to path (for tools import)
 from tools.prettyprint import PrettyPrint
-
+import math
 pp = PrettyPrint()
 
 # turn a file into a list
-def file_to_list(file_path:str):
-    a = []
+# x1, y1, x2, y2
+def file_to_list(file_path:str) -> list:
     b = []
     with open(file_path) as f:
-        for line in f:
-            tmp_a, tmp_b = line.split("->")
-            a.append(single_csv_str_to_list(tmp_a))
-            b.append(single_csv_str_to_list(tmp_b))
-    for i in range(len(a)):
-        pp.debug(str(a[i]) + " " + str(b[i]))
-    return a, b
-
-def single_csv_str_to_list(data:list):
-    data = data.split(",")
-    data[0] = int(data[0])
-    data[1] = int(data[1])
+        data = [list(map(int, line.strip().replace('->',',').split(','))) for line in f]
     return data
 
-def min_max_data(data):
-    max_x = data[0][0]
-    max_y = data[0][1]
-    min_x = data[0][0]
-    min_y = data[0][1]
-    for x, y in data:
-        max_x = max(x, max_x)
-        max_y = max(y, max_y)
-        min_x = min(x, min_x)
-        min_y = min(y, min_y)
-    return min_x, min_y, max_x, max_y
+# get max len for data lengths
+def xy_len(data):
+    x_len = max(max([(c[0], c[2])for c in data])) + 1
+    y_len = max(max([(c[1], c[3])for c in data])) + 1
+    return x_len, y_len
 
-def min_max_xy(a,b):
-    min_ax, min_ay, max_ax, max_ay = min_max_data(a)
-    min_bx, min_by, max_bx, max_by = min_max_data(b)
-    min_x = min(min_ax,min_bx)
-    min_y = min(min_ay,min_by)
-    max_x = max(max_ax,max_bx)
-    max_y = max(max_ay,max_by)
-    return min_x, min_y, max_x, max_y
-
-def populate_grid(a,b,grid):
-    for i in range(len(a)):
-        ax = a[i][0]
-        bx = b[i][0]
-        ay = a[i][1]
-        by = b[i][1]
-        pp.info(str(i)+": "+str(ax)+","+str(ay)+" "+str(bx)+","+str(by))
-        if ax == bx:
-            pp.warn("drawing vert")
-            # draw vertical
-            for j in range(min(ay,by),max(ay,by)+1):
-                grid[j][ax] += 1
-        if ay == by:
-            pp.warn("drawing hori")
-            # draw horizontal
-            for j in range(min(ax,bx),max(ax,bx)+1):
-                grid[ay][j] += 1
-
-    for line in grid:
-        pp.info(line)
-    return grid
-
-def check_for_overlap(grid):
+# append 1 to a grid for each 'line'
+# sum grid to return crossover total
+def calc_crossover(data, grid, diagonal=False):
+    pp.warn(len(data))
+    for x1, y1, x2, y2 in data:
+        # find x y starting pos and delta
+        xmin = min(x1, x2)
+        ymin = min(y1, y2)
+        delta_x = abs(x2 - x1)+1 # add one to account of offset
+        delta_y = abs(y2 - y1)+1
+        # draw vertical
+        if x1 == x2:
+            for i in range(delta_y):
+                grid[ymin + i][x1] += 1
+        # draw horizontal
+        elif y1 == y2:
+            for i in range(delta_x):
+                grid[y1][xmin + i] += 1
+        # draw diagonal
+        elif diagonal:
+            # fortunately the data is so that if it's not horizonatal
+            # or vertical entry, it's a 45 degree line
+            x_pos = -1
+            y_pos = -1
+            # find diagonal direction
+            if x2 > x1:
+                x_pos = 1
+            if y2 > y1:
+                y_pos = 1
+            # draw 45 degree line based of direction
+            for i in range( delta_x):
+                grid[(y_pos * i) + y1][(x_pos * i) + x1] += 1
+    # sum total
     total = 0
-    width = len(grid)
-    height = len(grid[0])
-    for i in range(width):
-        for j in range(height):
-            if grid[i][j] > 1:
-                total += 1
+    for i in grid:
+        for res in i:
+            if res > 1:
+                total+=1
     return total
+
 
 if __name__ == "__main__":
     # check the passed arguments are correct
@@ -90,17 +73,14 @@ if __name__ == "__main__":
     # for all given files
     input_files = sys.argv[1:]
     for input_file in input_files:
-        # read input file and get count
+        # read input file 
         pp.warn("File: " + input_file)
-        a, b = file_to_list(input_file)
-        # generate grid of size min max x and y
-        min_x, min_y, max_x, max_y = min_max_xy(a,b)
-        pp.info("Min xy: " + str(min_x) + "," + str(min_y))
-        pp.info("Max xy: " + str(max_x) + "," + str(max_y))
-        max_x += 1
-        max_y += 1
-        #grid = [[0 for x in range(min_x, max_x)] for y in range(min_y, max_y)]
-        grid = [[0 for x in range(max_x)] for y in range(max_y)]
-        grid = populate_grid(a,b,grid)
-        total = check_for_overlap(grid)
-        pp.info("Solution 1: " + str(total))
+        data = file_to_list(input_file)
+        x_len, y_len = xy_len(data)
+        # create grid
+        grid = [[0 for i in range(x_len)] for j in range(y_len)]
+        solution_1 = calc_crossover(data, grid)
+        grid = [[0 for i in range(x_len)] for j in range(y_len)]
+        solution_2 = calc_crossover(data, grid, diagonal=True)
+        pp.info("Solution 1: " + str(solution_1))
+        pp.info("Solution 2: " + str(solution_2))
