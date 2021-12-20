@@ -11,3 +11,7 @@ Simply change into the directory and run the bash script, for example to run day
 cd day01
 ./run.sh
 ```
+## What I've learnt
+
+- You can run python code in interactive mode by adding **-i**
+- You can write **breakpoint()** in a function and use interactive mode to query state
