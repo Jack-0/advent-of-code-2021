@@ -10,6 +10,8 @@ from tools.prettyprint import PrettyPrint
 import math
 pp = PrettyPrint()
 
+from collections import Counter, defaultdict
+
 # turn a file into a list
 def file_to_list(file_path:str) -> list:
     b = []
@@ -18,27 +20,24 @@ def file_to_list(file_path:str) -> list:
     return data[0]
 
 def lanternfish(iterations:int, data:list):
-    for i in range(iterations):
-        progress = "Progress [" + str(i) + "/" + str(iterations) + "]"
-        print(progress,end="\r")
-        data = modify_count(data)
-    return data
+    # use Counter to get the number of fish at a given stage
+    data_map = Counter(map(int, data))
+    pp.debug(data_map)
 
-def modify_count(data:list):
-    idx_offset = 0
-    for idx, value in enumerate(data):
-        if value == 0:
-            # reset the fishes spawn counter if it hits '0'
-            data[idx] = 6
-            idx_offset += 1
-        else:
-            data[idx] -= 1
-    # append the new spawns of fish
-    for i in range(idx_offset):
-        # TODO could we append this in the spawn statment code?
-        data.append(8)
-    return data
-
+    for _ in range(iterations):
+        new_map = defaultdict(int)
+        for fish_status, num in data_map.items():
+            if fish_status == 0:
+                # increase the reset counter '6'
+                new_map[6] += num
+                # increase the new fish counter '8'
+                new_map[8] += num
+            else:
+                # every fish below the current status is incremented
+                # by one according to the fish spawning rules
+                new_map[fish_status-1] += num
+        data_map = new_map
+    return sum(new_map.values())
 
 
 if __name__ == "__main__":
@@ -52,8 +51,8 @@ if __name__ == "__main__":
         # read input file 
         pp.warn("File: " + input_file)
         data = file_to_list(input_file)
-        data = lanternfish(80, data)
-        pp.warn("Solution part 1: " + str(len(data)))
-        data = lanternfish(256, data)
-        pp.warn("Solution part 2: " + str(len(data)))
+        res = lanternfish(80, data)
+        pp.warn("Solution part 1: " + str(res))
+        res = lanternfish(256, data)
+        pp.warn("Solution part 2: " + str(res))
 
