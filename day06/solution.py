@@ -26,16 +26,19 @@ def lanternfish(iterations:int, data:list):
 
     for _ in range(iterations):
         new_map = defaultdict(int)
-        for fish_status, num in data_map.items():
+        for fish_status, total in data_map.items():
             if fish_status == 0:
                 # increase the reset counter '6'
-                new_map[6] += num
+                new_map[6] += total
                 # increase the new fish counter '8'
-                new_map[8] += num
+                new_map[8] += total
+                # note values are equal to num as if there are x fish in 
+                # stage zero, x fish reset to the value 6 and x fish are
+                # spawned into fish_status 8
             else:
                 # every fish below the current status is incremented
                 # by one according to the fish spawning rules
-                new_map[fish_status-1] += num
+                new_map[fish_status-1] += total
         data_map = new_map
     return sum(new_map.values())
 
