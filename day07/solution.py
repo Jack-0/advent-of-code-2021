@@ -19,23 +19,23 @@ def file_to_list(file_path:str) -> list:
         data = [list(map(int, line.strip().split(','))) for line in f]
     return data[0]
 
-def mean(data:list):
-    return sum(data) / len(data)
-
-def mode(data:list):
-    return max(data, key=data.count)
-
-def calulate_max_fuel_to_pos(data:list, pos:int):
+def calulate_max_fuel_to_pos(data:list, pos:int, crab_logic:bool=False):
     fuel = 0
     for x in data:
-        fuel += abs(x - pos)
+        if not crab_logic:
+            fuel += abs(x - pos)
+        else:
+            base = abs(x - pos)
+            crab_fuel = ((base + 1) * base) / 2
+            fuel += crab_fuel
     return fuel
 
-def get_least_expensive(data:list):
+def get_least_expensive(data:list, crab_logic:bool=False):
     data_map = Counter(map(int, data))
     fuel_map = defaultdict(int)
-    for value, _ in data_map.items():
-        fuel_map[value] = calulate_max_fuel_to_pos(data, value)
+    #for value, _ in data_map.items():
+    for value in range(max(data)):
+        fuel_map[value] = calulate_max_fuel_to_pos(data, value, crab_logic)
     min_pos = min(fuel_map, key=fuel_map.get)
     return fuel_map[min_pos]
 
@@ -51,9 +51,7 @@ if __name__ == "__main__":
         # read input file 
         pp.warn("File: " + input_file)
         data = file_to_list(input_file)
-        data_mean = mean(data)
-        data_mode = mode(data)
-        pp.warn("mean: " + str(data_mean))
-        pp.warn("mode: " + str(data_mode))
         res = get_least_expensive(data)
-        pp.warn("Solution 1: " + str(res))
+        pp.info("Solution 1: " + str(res))
+        res = get_least_expensive(data, crab_logic=True)
+        pp.info("Solution 2: " + str(int(res)))
